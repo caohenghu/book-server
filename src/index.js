@@ -1,20 +1,18 @@
-let express = require('express');
-let cookieParser = require('cookie-parser');
-let bodyParser = require('body-parser');
-let session = require('express-session');
-let MongoStore = require('connect-mongo')(session);
-let app = express();
-let httpHelper = require('./utils/httpHelper');
-let bookParser = require('./utils/bookParser');
-let fs = require('fs');
-let iconv = require('iconv-lite');
-let bookCtrl = require('./controllers/book');
-let userCtrl = require('./controllers/user');
-
+let express = require('express')
+// let cookieParser = require('cookie-parser')
+// let bodyParser = require('body-parser')
+// let session = require('express-session')
+// let MongoStore = require('connect-mongo')(session)
+let app = express()
+let httpHelper = require('./utils/httpHelper')
+let bookParser = require('./utils/bookParser')
+// let fs = require('fs')
+// let iconv = require('iconv-lite')
+let bookCtrl = require('./controllers/book')
+let userCtrl = require('./controllers/user')
 
 // app.use(cookieParser());
-app.use(bodyParser());
-
+// app.use(bodyParser())
 
 // app.use(session({
 //     store: new MongoStore({ // 本地存储session（也可以选择其他store，比如redis的)
@@ -41,20 +39,20 @@ app.use(bodyParser());
 //     }
 // });
 
-//设置跨域访问
-app.all('*', function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    res.header('Access-Control-Allow-Methods', 'PUT,POST,DELETE');
+// 设置跨域访问
+app.all('*', function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*')
+    // res.header('Access-Control-Allow-Headers', 'Content-Type')
+    // res.header('Access-Control-Allow-Credentials', 'true')
+    // res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+
     // res.header('X-Powered-By', '3.2.1'); // 不设置也没有关系，会默认为Express
     // res.header('Content-Type', 'application/json; charset=utf-8'); // 不设置也没关系，会默认为text/html; charset=utf-8
-    next();
-});
+    next()
+})
 
-
-app.use('/book', bookCtrl);
-app.use('/user', userCtrl);
-
+app.use('/book', bookCtrl)
+app.use('/user', userCtrl)
 
 app.get('/jd/book/:url', (req, res) => {
     // let buffer = fs.readFileSync("./utils/1.html");
@@ -62,19 +60,20 @@ app.get('/jd/book/:url', (req, res) => {
     // let result = bookParser(data);
     //
     // res.send({code: 0, error: '', data: result});
-    let url = decodeURIComponent(req.params.url);
-    httpHelper.get(url, 10000, function(err, data) {
-        let result = bookParser(data);
-        res.send({code: 0, error: '', data: result});
-    }, 'gbk');
-});
+    let url = decodeURIComponent(req.params.url)
+    httpHelper.get(url, 10000, function (err, data) {
+        let result = bookParser(data)
+        res.send({ code: 0, error: '', data: result })
+        err && console.err(err)
+    }, 'gbk')
+})
 
 let server = app.listen(3000, function () {
-    let address = server.address();
-    let host = address.address;
-    let port = address.port;
+    let address = server.address()
+    let host = address.address
+    let port = address.port
 
-    console.log(server);
+    // console.log(server)
 
-    console.log('Example app listening at http://%s:%s', host, port);
-});
+    console.log('Example app listening at http://%s:%s', host, port)
+})

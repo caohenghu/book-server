@@ -4,11 +4,11 @@
  * @module tool/httpHelper
  */
 
-var http = require('http');
-var https = require('https');
-var qs = require('querystring');
-var iconv = require('iconv-lite');
-var BufferHelper = require('bufferhelper');
+var http = require('http')
+var https = require('https')
+var qs = require('querystring')
+var iconv = require('iconv-lite')
+var BufferHelper = require('bufferhelper')
 
 /**
  * @exports tool/httpHelper
@@ -30,58 +30,57 @@ var httpHelper = {
      * @param {String} [encoding='utf-8'] 编码格式
      */
     request: function (options, timeout, data, callback, encoding) {
-        var httpLib = http;
+        var httpLib = http
         if (options.protocol && options.protocol === 'https:') {
-            httpLib = https;
+            httpLib = https
         }
-        var content = {};
+        var content = {}
         if (options.json) {
-            content = JSON.stringify(data);
+            content = JSON.stringify(data)
         } else {
-            content = (options.encode && options.encode.toLocaleLowerCase() == 'gbk') ? qs.stringify(data, null, null, {encodeURIComponent: escape}) : qs.stringify(data);
+            content = (options.encode && options.encode.toLocaleLowerCase() === 'gbk') ? qs.stringify(data, null, null, { encodeURIComponent: escape }) : qs.stringify(data)
         }
         if (options.method.toLowerCase() === 'post') {
-            options.headers = options.headers || {};
-            options.headers['Content-Type'] = options.json ? 'application/json' : 'application/x-www-form-urlencoded';
-            options.headers['Content-Length'] = Buffer.byteLength(content);
+            options.headers = options.headers || {}
+            options.headers['Content-Type'] = options.json ? 'application/json' : 'application/x-www-form-urlencoded'
+            options.headers['Content-Length'] = Buffer.byteLength(content)
         }
         /** 为true时直接返回数据流 */
-        options.buffer = options.buffer || false;
+        options.buffer = options.buffer || false
 
         var req = httpLib.request(options, function (res) {
-            var bufferHelper = new BufferHelper();
+            var bufferHelper = new BufferHelper()
             res.on('data', function (chunk) {
-                bufferHelper.concat(chunk);
-            });
+                bufferHelper.concat(chunk)
+            })
             res.on('end', function () {
-                var _data;
+                var _data
                 if (options.buffer) {
-                    _data = bufferHelper.toBuffer();
-                }
-                else {
-                    if (typeof encoding != 'undefined' && encoding !== null) {
-                        _data = iconv.decode(bufferHelper.toBuffer(), encoding);
+                    _data = bufferHelper.toBuffer()
+                } else {
+                    if (typeof encoding !== 'undefined' && encoding !== null) {
+                        _data = iconv.decode(bufferHelper.toBuffer(), encoding)
                     } else {
-                        _data = iconv.decode(bufferHelper.toBuffer(), 'utf-8');
+                        _data = iconv.decode(bufferHelper.toBuffer(), 'utf-8')
                     }
                 }
-                callback(null, _data, res, req);
-            });
-        });
+                callback(null, _data, res, req)
+            })
+        })
 
         req.on('error', function (err) {
-            callback(err);
-        });
+            callback(err)
+        })
 
-        req.write(content);
+        req.write(content)
 
         if (timeout && timeout > 0) {
             req.setTimeout(timeout, function () {
-                callback(new Error('request timeout'), '');
-            });
+                callback(new Error('request timeout'), '')
+            })
         }
 
-        req.end();
+        req.end()
     },
 
     /**
@@ -93,13 +92,13 @@ var httpHelper = {
      * @param {Object=} header 请求头对象
      */
     get: function (url, timeout, callback, encoding, header) {
-        var options = require('url').parse(url);
-        options.method = 'GET';
+        var options = require('url').parse(url)
+        options.method = 'GET'
         if (header) {
-            options.headers = header;
+            options.headers = header
         }
 
-        this.request(options, timeout, {}, callback, encoding);
+        this.request(options, timeout, {}, callback, encoding)
     },
 
     /**
@@ -114,20 +113,20 @@ var httpHelper = {
      * @param {Boolean=} [json=false] 发送的是否json数据
      */
     post: function (url, timeout, data, callback, encoding, header, reqEncoding, json) {
-        var options = require('url').parse(url);
-        options.method = 'POST';
+        var options = require('url').parse(url)
+        options.method = 'POST'
         if (header) {
-            options.headers = header;
+            options.headers = header
         }
         if (reqEncoding) {
-            options.encode = reqEncoding;
+            options.encode = reqEncoding
         }
         if (json) {
-            options.json = json;
+            options.json = json
         }
-        this.request(options, timeout, data, callback, encoding);
+        this.request(options, timeout, data, callback, encoding)
     }
-};
+}
 
 /**
  * @description 处理请求响应的回调方法
@@ -137,4 +136,4 @@ var httpHelper = {
  * @param {Object} res 响应流对象
  */
 
-module.exports = httpHelper;
+module.exports = httpHelper
